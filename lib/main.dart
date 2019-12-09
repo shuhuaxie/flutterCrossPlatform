@@ -17,7 +17,14 @@ class MyApp extends StatelessWidget {
   }
 }
 //参考 https://flutter.dev/docs/development/platform-integration/platform-channels
+
+// normal channel
+//- MethodChannel
+//- EventChannel
+//- BasicMessageChannel
+const  String channel = 'samples.flutter.dev/battery';
 class MyHomePage extends StatefulWidget {
+
   MyHomePage({Key key, this.title}) : super(key: key);
 
   final String title;
@@ -27,11 +34,22 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  
-  static const platform = const MethodChannel('samples.flutter.dev/battery');
+
+  static const platform = const MethodChannel(channel);
   String _batteryLevel = 'Unknown battery level.';
   @override
   Widget build(BuildContext context) {
+
+    MethodChannel(channel).setMethodCallHandler((handler) {
+      //根据key判断android传过来的值
+      switch (handler.method) {
+        case 'android':
+          setState(() {_batteryLevel = handler.arguments.toString();});
+          break;
+      }
+      return new Future(() => "ok");
+    });
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
